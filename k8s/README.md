@@ -6,7 +6,8 @@
 1Master,3Workerの構成になっています。  
 これらはすべてvagrantで立ち上げられ、Kubernetesが実行されている状態になります。  
 
-- Node Spec
+- Node Spec  
+
 |役割|ノード数|OS|CPU|Memory|Disk1|Disk2|
 |:-|:-|:-|:-|:-|:-|:-|
 |Master|1|Almalinux|4code|4096MB|20GB||
