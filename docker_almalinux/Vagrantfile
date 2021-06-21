@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "almalinux/8"
+    config.vagrant.plugins = ["vagrant-vbguest", "vagrant-hostmanager"]
+    config.hostmanager.enabled = true
+    config.hostmanager.manage_guest = true
+    config.vbguest.auto_update = false 
+    
+    config.vm.hostname = "docker.training.home"
+    config.vm.network "private_network", ip: "192.168.225.10"   
+  
+    config.vm.provider "virtualbox" do |vb|
+      vb.gui = true
+      vb.memory = "4094"
+      vb.cpus = "4"
+    end
+
+    config.vm.provision "shell", :path => "scripts/init.sh"
+    config.vm.provision "shell", :path => "scripts/docker.sh"
+end
+  
