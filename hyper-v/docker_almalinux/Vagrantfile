@@ -1,0 +1,26 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "almalinux/8"
+    config.vagrant.plugins = ["vagrant-vbguest", "vagrant-reload"] #, "vagrant-hostmanager"]
+    #config.hostmanager.enabled = true
+    #config.hostmanager.manage_guest = true
+    config.vbguest.auto_update = false 
+    config.vm.synced_folder ".", "/vagrant", type: "smb", smb_username: "smb", smb_password: "LABtest01!"
+    
+    config.vm.hostname = "docker.training.home"
+  
+    config.vm.provider "hyper-v" do |hv|
+      hv.cpus = 4
+      hv.memory = 4096
+      hv.vmname = "docker.training.home"
+      hv.enable_virtualization_extensions = true
+    end
+
+    config.vm.provision "shell", :path => "scripts/init.sh"
+    config.vm.provision "shell", :path => "scripts/docker.sh"
+    config.vm.provision "shell", :path => "scripts/hyperv_network.sh"
+    config.vm.provision "reload"
+end
+  

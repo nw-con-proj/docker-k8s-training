@@ -1,21 +1,38 @@
 # Docker / Kubernetesを触ってみよう  
 
 DockerやKubernetesを実際に触ってみるための環境構築とハンズオンの手順です。
-環境は Vagrant + VirtualBox で構成しています。  
+環境は2種類用意しています。
+
+- Windows + Vagrant + VirtualBox
+- Windows + Vagrant + Hyper-V  
+
+VirtualBoxを使ったほうが（書いている人としては）扱いやすいかと思います。
+今回、Azure Lab Servicesを使った環境で試したところVirtual Boxでは正常に稼働しないため、Hyper-V版を用意しています。  
+Azure Lab Servicesを使う方はHyper-V版を使ってください。  
 
 ## 稼働環境
 下記の環境でこの手順を作成しています。  
 
+- VirtualBox版
 |||
 |:--|:--|
 |OS|Windows 10|
-|CPU|12Core|
+|CPU|8Core|
 |mem|32GB|
 |Disk|100GB|
 |VirtualBox| version 6.1.20 r143896|
 |Vagrant| version 2.2.16|
 
-> Azure Labsで稼働可能です  
+- Hyper-V版
+|||
+|:--|:--|
+|OS|Windows Server 2019|
+|CPU|8Core|
+|mem|32GB|
+|Disk|100GB|
+|Hyper-V| |
+|Vagrant| version 2.2.16|
+
 
 ### Vagrantにて構成できる環境  
 
@@ -57,8 +74,14 @@ DockerやKubernetesを実際に触ってみるための環境構築とハンズ�
 
 DockerやKubernetesを動かす環境がない人向けにAzure Lab Serviceを利用しハンズオンをしていただくことも可能です。  
 
-環境のBootupからハンズオンまでを含めた手順はそれぞれ下記をご確認ください。  
+環境の起動からハンズオンまでを含めた手順はそれぞれ下記をご確認ください。  
 
+
+## Azure Lab Servicesセットアップ  
+LabService環境をセットアップする人向けのドキュメントです。　
+ラボの基本的なセットアップとして新しいラボの作成から日本語化する方法を[LAB_SETUP.md](LAB_SETUP.md)に記載しています。  
+
+スクリプト化するとダウンロードに時間がかかりすぎるので手動でのセットアップとしています。  
 
 ## Ex.
 

@@ -28,6 +28,8 @@ vagrantを使って、環境を立ち上げます。
 また、Powershellだと（作った人的に）都合が悪かったので、**GitBash** を使って作業を行います。
 
 ```
+export VAGRANT_DEFAULT_PROVIDER=hyperv
+export VAGRANT_EXPERIMENTAL="disks"
 cd c:\vm\
 git clone https://github.com/keisz/~~~
 cd docker-k8s-hands-on/k8s
@@ -757,7 +759,7 @@ nginx-deploy-7d776cc564-skklz   1/1     Running   0          19m   10.244.3.198 
 
 - Nodeの停止  
   ホストOS（Windows）のスタートメニューから **VirtualBox** を開き、対象のWorkerノードを選択、右クリックし、閉じる->ACPIシャットダウン　を実行します。  
-  ![](../img/virtualbox1.png)
+  ![](../../img/virtualbox1.png)
 
 - 状態の監視  
   監視用のコンソールでWorker-2で稼働しているPodがどうなるか監視します。
@@ -833,7 +835,7 @@ Worker-2は停止しているため、Podの削除は完了しません。
 
 - Workerノードの起動
   停止したWorkerノードをVirtualBoxのコンソールから起動します。  
-  ![](../img/virtualbox2.png)
+  ![](../../img/virtualbox2.png)
 
 - Podの状態確認  
   監視用のコンソールを確認します。 ノードが起動し、Kubernetesクラスターのノードとして稼働したタイミングでTerminatingとなっていたPodが削除されます。  
@@ -935,10 +937,10 @@ Kubernetesクラスタのすべてのノードの **30080** にアクセスし�
   `http://192.168.225.102:30080`
   `http://192.168.225.103:30080`
 
-  ![](../img/2021-06-22_10h37_37.png)
-  ![](../img/2021-06-22_10h37_57.png)
-  ![](../img/2021-06-22_10h38_12.png)
-  ![](../img/2021-06-22_10h38_28.png)
+  ![](../../img/2021-06-22_10h37_37.png)
+  ![](../../img/2021-06-22_10h37_57.png)
+  ![](../../img/2021-06-22_10h38_12.png)
+  ![](../../img/2021-06-22_10h38_28.png)
 
 
 ### 1つのServiceで複数のPodにトラフィックが分散されることを確認してみる  
@@ -1048,7 +1050,7 @@ nginx           LoadBalancer   10.100.1.21     192.168.225.150   8080:31731/TCP 
 ```
 
 LoadBalancerは **8080** で待ち受けていますので、 `http://192.168.225.150:8080` にアクセスします。  
-![](../img/2021-06-22_13h38_50.png)  
+![](../../img/2021-06-22_13h38_50.png)  
 
 
 ///-----------一旦ここまで
