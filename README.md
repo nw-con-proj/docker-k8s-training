@@ -95,7 +95,7 @@ LabService環境をセットアップする人向けのドキュメントです�
   - Oracle社製のVMware WorkStation みたいなものです。クライアントPC上でVMを作成できます。
 - Vagrant
   - HashiCorp社製の違う環境に移行可能な開発環境を簡単に構築・管理し、配布することができる開発環境作成ツールです。
-  - Vagrantを使ってVirtualBox上にVMをデプロイします。  
+  - Vagrantを使ってVirtualBoxもしくはHyper-V上にVMをデプロイします。  
 
 
 

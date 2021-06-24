@@ -42,9 +42,9 @@ echo "source <(kubectl completion bash)" >> /home/vagrant/.bashrc
 
 kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 
-cat <<EOF | tee /vagrant/share/join-worker.sh
+cat <<EOF | tee /vagrant/join-worker.sh
 #!/bin/bash
 sudo $(kubeadm token create --print-join-command)
 EOF
-chmod +x /vagrant/share/join-worker.sh 
+chmod +x /vagrant/join-worker.sh 
 

@@ -3,4 +3,4 @@
 set -e
 
 swapoff -a
-/vagrant/share/join-worker.sh
+/vagrant/join-worker.sh

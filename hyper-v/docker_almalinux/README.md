@@ -39,15 +39,19 @@
 ## 環境の立ち上げ  
 vagrantを使って、環境を立ち上げます。  
 また、Powershellだと（作った人的に）都合が悪かったので、**GitBash** を使って作業を行います。
+※ GitBashは必ず **管理者で実行**をしてください。  
+![](../../img/2021-06-24_10h47_20.png)  
 
 ```
 export VAGRANT_DEFAULT_PROVIDER=hyperv
-cd c:\vm\
-git clone https://github.com/keisz/~~~
-cd docker-k8s-hands-on/docker_almalinux
+mkdir /c/vm
+cd /c/vm/
+git clone https://github.com/nw-con-proj/docker-k8s-training.git
+cd docker-k8s-training/hyper-v/docker_almalinux/
 vagrant up
 ```
 
+一度、プラグインのインストール画面が表示されるので、**y**を入力しインストール後、再度 `vagrant up` を実行します。
 VMが作成されるまで5分程度待ちます。  
 
 ## VMへのログインと確認  
@@ -339,7 +343,7 @@ CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS   
 08dd913973ee   nginx:1.21.0   "/docker-entrypoint.…"   3 seconds ago   Up 3 seconds   80/tcp    focused_johnson
 ```
 
-コンテナ実行時にパラメータを付与し、名前をしてしてみます。   
+コンテナ実行時にパラメータを付与し、**test01**という名前のコンテナーを実行してみます。   
 
 `docker run --name test01 hello-world`
 
