@@ -13,7 +13,8 @@ Azure Lab Servicesを使う方はHyper-V版を使ってください。
 ## 稼働環境
 下記の環境でこの手順を作成しています。  
 
-- VirtualBox版
+- VirtualBox版  
+
 |||
 |:--|:--|
 |OS|Windows 10|
@@ -23,7 +24,8 @@ Azure Lab Servicesを使う方はHyper-V版を使ってください。
 |VirtualBox| version 6.1.20 r143896|
 |Vagrant| version 2.2.16|
 
-- Hyper-V版
+- Hyper-V版  
+
 |||
 |:--|:--|
 |OS|Windows Server 2019|
@@ -70,15 +72,19 @@ Azure Lab Servicesを使う方はHyper-V版を使ってください。
 
 ## ハンズオン  
 ハンズオン内容はまだ触ったことのない人向けです。  
-座学はありませんのでWeb上にある素敵な資料をご確認ください。最低限[このあたり](https://www.slideshare.net/KoheiTokunaga/ss-122754942)を読んでおくとわかりやすいと思います。
+座学はありませんのでWeb上にある素敵な資料をご確認ください。最低限[この資料](https://www.slideshare.net/KoheiTokunaga/ss-122754942)を読んでおくとわかりやすいと思います。
 
 DockerやKubernetesを動かす環境がない人向けにAzure Lab Serviceを利用しハンズオンをしていただくことも可能です。  
 
 環境の起動からハンズオンまでを含めた手順はそれぞれ下記をご確認ください。  
 
+[Hyper-Vを利用](hyper-v/README.md)  
+[VirtualBox利用](virtualbox/README.md)  
+
+
 
 ## Azure Lab Servicesセットアップ  
-LabService環境をセットアップする人向けのドキュメントです。　
+LabService環境をセットアップする人向けのドキュメントです。  
 ラボの基本的なセットアップとして新しいラボの作成から日本語化する方法を[LAB_SETUP.md](LAB_SETUP.md)に記載しています。  
 
 スクリプト化するとダウンロードに時間がかかりすぎるので手動でのセットアップとしています。  
