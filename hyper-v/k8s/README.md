@@ -30,13 +30,14 @@ vagrantを使って、環境を立ち上げます。
 ```
 export VAGRANT_DEFAULT_PROVIDER=hyperv
 export VAGRANT_EXPERIMENTAL="disks"
-cd c:\vm\
-git clone https://github.com/keisz/~~~
-cd docker-k8s-hands-on/k8s
+mkdir /c/vm
+cd /c/vm/
+git clone https://github.com/nw-con-proj/docker-k8s-training.git
+cd docker-k8s-training/hyper-v/k8s
 vagrant up
 ```
 
-VMが作成されるまで15-20分程度待ちます。  
+VMが作成されるまで20分程度待ちます。  
 
 ### 環境の作成方法  
 kubeadmを利用してKubernetesクラスタを作成しています。  
@@ -47,10 +48,10 @@ kubeadmを利用してKubernetesクラスタを作成しています。
 
 |hostname|IP|
 |:-|:-|
-|master|192.168.225.100|
-|worker-1|192.168.225.101|
-|worker-2|192.168.225.102|
-|worker-3|192.168.225.103|
+|master|192.168.0.100|
+|worker-1|192.168.0.101|
+|worker-2|192.168.0.102|
+|worker-3|192.168.0.103|
 
 
 ## VMへのログインと確認   
@@ -58,7 +59,7 @@ puttyやTeraterm等でSSH接続が可能です。また、立ち上げ時につ�
 
 |||
 |:-|:-|
-|IP|192.168.225.100|
+|IP|192.168.0.100|
 |user|vagrant|
 |password|vagrant|
 
