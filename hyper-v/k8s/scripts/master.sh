@@ -8,6 +8,8 @@ export IPADDR=$(ip a show eth0 | grep inet | grep -v inet6 | awk '{print $2}' | 
 
 swapoff -a
 
+dnf install -y git
+
 kubeadm config images pull
 
 cat <<EOF | tee ~/kubeadm-config.yaml
