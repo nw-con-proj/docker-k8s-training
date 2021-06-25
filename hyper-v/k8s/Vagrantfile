@@ -3,15 +3,12 @@
 
 Vagrant.configure("2") do |config|
     config.vm.box = "almalinux/8"
-    config.vagrant.plugins = ["vagrant-vbguest", "vagrant-reload"] #, "vagrant-hostmanager"]
-    #config.hostmanager.enabled = true
-    #config.hostmanager.manage_guest = true
+    config.vagrant.plugins = ["vagrant-vbguest", "vagrant-reload"]
     config.vbguest.auto_update = false 
     config.vm.synced_folder ".", "/vagrant", type: "smb", smb_username: "smb", smb_password: "LABtest01!"
     
     config.vm.define "master" do |master|
       master.vm.hostname = "master.training.home"
-      #master.vm.network "private_network", ip: "192.168.225.100"
       master.vm.provider "hyper-v" do |hv|
         hv.cpus = 4
         hv.memory = 4096
@@ -31,15 +28,11 @@ Vagrant.configure("2") do |config|
     config.vm.define "worker-#{n}" do |worker|
       worker.vm.hostname = "worker-#{n}.training.home"
       worker.vm.disk :disk, name: "pv", size: "10GB"
-      #worker.vm.network "private_network", ip: "192.168.225.10#{n}"
       worker.vm.provider "hyper-v" do |hv|
         hv.cpus = 4
         hv.memory = 4096
         hv.vmname = "master.training.home"
         hv.enable_virtualization_extensions = true      
-      #vm.provider "virtualbox" do |vb|
-      #  vb.customize ['createmedium', 'disk', '--filename', "k8s_training#{n}.vmdk", '--format', 'VDI', '--size', 10 * 1024]
-      #  vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', "k8s_training#{n}.vmdk"]
       end  
 
       worker.vm.provision "shell", :path => "scripts/init.sh"

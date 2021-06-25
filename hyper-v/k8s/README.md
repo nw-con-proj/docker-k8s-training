@@ -1064,27 +1064,6 @@ Kubernetes の永続ボリュームの作成方法については様々な方法
 
 詳細は井上さんの資料を確認してください。  
 
-/* 削除するかも
-### Persistent VolumeとPersistent Volume ClaimとStorage Class  
-Kubernetes上でストレージを利用するときには、下記の組み合わせの設定が必要になります。  
-
-- Persistent Volume Claim + Storage Class
-- Persistent Volume Claim + Persistent Volume  
-
-#### Persistent Volume Claim
-Persistent Volume Claimはその名の通りVolumeを要求するリソースです。
-PodにマウントするストレージをPersistent Volume Claimを使ってSrotageから割り当てるように要求します。
-
-#### Persistent Volume  
-Persistent VolumeはPersistent Volume Claimが来た場合の静的なストレージのリストです。  
-Persistent Volumeは事前に作成しておき、Persistent Volume Claimが来た時に対応できるPersistent Volumeを割り当てることになります。  
-仮にPersistent Volume Claimが20GBのストレージを要求してきた場合にPersistent Volume に 40GB のストレージしか用意されていない場合、40GBの物が割り当てられてしまいます。  
-20GB分については使用しないことになるため無駄が発生します。
-
-
-#### Storage Class
-*/
-
 ### Portworxのインストール  
 今回はSDSとしてPortworxをインストールして利用します。  
 SDSとして使うDiskは Workerノードにマウントされている **/dev/sdb** です。  
@@ -1098,29 +1077,216 @@ mqsda2   8:2    0 17.6G  0 part /
 sdb      8:16   0   10G  0 disk
 ```
 
-下記コマンドを実行し、インストールします。  
+**Master node**にて下記コマンドを実行し、インストールします。  
 `kubectl apply -f 'https://install.portworx.com/2.7?comp=pxoperator'`  
 少し待ってから、下記を実行
 `kubectl apply -f 'https://install.portworx.com/2.7?operator=true&mc=false&kbver=&oem=esse&user=8dea14c3-40dd-11eb-a2c5-c24e499c7467&b=true&c=px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e&stork=true&csi=true&lh=true&mon=true&st=k8s&e=storage%3Dportworx&promop=true'`  
 
 
 ```
-[vagrant@master ~]$ kubectl apply -f 'https://install.portworx.com/2.7?comp=pxoperator'
+[root@master ~]# kubectl apply -f 'https://install.portworx.com/2.7?comp=pxoperator'
 serviceaccount/portworx-operator created
+podsecuritypolicy.policy/px-operator created
 clusterrole.rbac.authorization.k8s.io/portworx-operator created
 clusterrolebinding.rbac.authorization.k8s.io/portworx-operator created
 deployment.apps/portworx-operator created
 
-[vagrant@master ~]$ kubectl apply -f 'https://install.portworx.com/2.7?operator=true&mc=false&kbver=&oem=esse&user=8dea14c3-40dd-11eb-a2c5-c24e499c7467&b=true&c=px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e&stork=true&csi=true&lh=true&mon=true&st=k8s&e=storage%3Dportworx&promop=true'
+[root@master ~]# kubectl apply -f 'https://install.portworx.com/2.7?operator=true&mc=false&kbver=&oem=esse&user=8dea14c3-40dd-11eb-a2c5-c24e499c7467&b=true&c=px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e&stork=true&csi=true&lh=true&mon=true&st=k8s&e=storage%3Dportworx&promop=true'
 storagecluster.core.libopenstorage.org/px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e created
-secret/px-essential unchanged
+secret/px-essential created
 ```  
 
 Podやその他のリソースが作成され始めます。  
 `kubectl get pod -n kube-system` を実行し、すべてのPodが **Running** となり、*Ready*の値が 2/2 などすべて動いていることを確認します。  
 ※ 10~15分かかります。  
 
+```
+[root@master ~]# kubectl -n kube-system get pods
+NAME                                                    READY   STATUS    RESTARTS   AGE
+autopilot-7b4f7f58f4-hrl6l                              1/1     Running   0          7m34s
+calico-kube-controllers-7f4f5bf95d-qgfd6                1/1     Running   0          83m
+calico-node-8plwf                                       1/1     Running   0          72m
+calico-node-cz4c4                                       1/1     Running   0          83m
+calico-node-j7954                                       1/1     Running   0          78m
+calico-node-z2wvk                                       1/1     Running   0          66m
+coredns-74ff55c5b-cwlbq                                 1/1     Running   0          83m
+coredns-74ff55c5b-w6f9c                                 1/1     Running   0          83m
+etcd-master.training.home                               1/1     Running   0          83m
+kube-apiserver-master.training.home                     1/1     Running   0          83m
+kube-controller-manager-master.training.home            1/1     Running   1          83m
+kube-proxy-gdfkc                                        1/1     Running   0          72m
+kube-proxy-gxv6h                                        1/1     Running   0          66m
+kube-proxy-pwf2g                                        1/1     Running   0          78m
+kube-proxy-x2hv6                                        1/1     Running   0          83m
+kube-scheduler-master.training.home                     1/1     Running   1          83m
+portworx-api-952vt                                      1/1     Running   0          7m33s
+portworx-api-jhgws                                      1/1     Running   0          7m33s
+portworx-api-q9vds                                      1/1     Running   0          7m33s
+portworx-kvdb-4gk5j                                     1/1     Running   0          83s
+portworx-kvdb-7kcf5                                     1/1     Running   0          98s
+portworx-kvdb-crj9m                                     1/1     Running   0          65s
+portworx-operator-d6567d9d6-q2xbz                       1/1     Running   1          8m21s
+prometheus-px-prometheus-0                              3/3     Running   1          6m16s
+px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e-6bg6r   2/2     Running   0          7m34s
+px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e-6fwdw   2/2     Running   0          7m34s
+px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e-ngzrb   2/2     Running   0          7m34s
+px-csi-ext-5686675c58-ncghm                             3/3     Running   0          7m35s
+px-csi-ext-5686675c58-nmlz8                             3/3     Running   0          7m35s
+px-csi-ext-5686675c58-slcxs                             3/3     Running   0          7m35s
+px-lighthouse-7dc48b77c8-jqxw4                          3/3     Running   0          7m40s
+px-prometheus-operator-8c88487bc-59zx4                  1/1     Running   0          7m35s
+stork-78d49d769c-bvt8s                                  1/1     Running   1          7m41s
+stork-78d49d769c-dvqh5                                  1/1     Running   1          7m41s
+stork-78d49d769c-mjf9k                                  1/1     Running   0          7m41s
+stork-scheduler-586cdb9796-9nfzt                        1/1     Running   0          7m40s
+stork-scheduler-586cdb9796-m27w2                        1/1     Running   0          7m40s
+stork-scheduler-586cdb9796-pm7lq                        1/1     Running   1          7m40s
+```
+
+#### Portworxのステータス確認  
+Portworxのステータスを確認します。  
+GUIが自動的にインストールされているのでGUIから確認します。  
+
+- kubernetes上のPortworxGUIのServiceを確認します。 
+  `kubectl -n kube-system get service` を実行します。  
+  出力されたリストの **px-lighthouse** がGUIの設定です。  
+
+```
+[root@master ~]# kubectl -n kube-system get svc
+NAME                        TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                               AGE
+kube-dns                    ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP                84m
+kubelet                     ClusterIP   None             <none>        10250/TCP                             6m56s
+portworx-api                ClusterIP   10.110.88.11     <none>        9001/TCP,9020/TCP,9021/TCP            8m10s
+portworx-operator-metrics   ClusterIP   10.105.180.81    <none>        8999/TCP                              8m22s
+portworx-service            ClusterIP   10.101.207.239   <none>        9001/TCP,9019/TCP,9020/TCP,9021/TCP   8m9s
+prometheus-operated         ClusterIP   None             <none>        9090/TCP                              6m52s
+px-csi-service              ClusterIP   None             <none>        <none>                                8m10s
+px-lighthouse               NodePort    10.105.202.26    <none>        80:31796/TCP,443:30891/TCP            8m15s
+px-prometheus               ClusterIP   10.111.23.9      <none>        9090/TCP                              8m10s
+stork-service               ClusterIP   10.98.138.26     <none>        8099/TCP,443/TCP                      8m16s
+```
 
 
+- Nodeportが*80:31796*で設定されていますので、 Webブラウザから **http://192.168.0.100:31796** にアクセスします。  
+  user: admin   
+  password: Password1
 
+  ![](../../img/2021-06-28_13h28_21.png)  
+
+- Portworxクラスターのステータスが表示されます。  **px-cluster** をクリックします。  
+  [](../../img/2021-06-28_13h34_34.png)   
+
+- *Drives* をクリックし、どのデバイスがPortworxとして利用されているか確認します。  
+  各Workerノードの */dev/sdb* がPortworxのデバイスとして利用されていることがわかります。  
+  ![](../../img/2021-06-28_13h36_30.png)  
+
+
+### Storage Classの作成  
+PodからPersistent Volumeを切り出すときにPersistent Volume ClaimからStorage Classを指定Portworxを利用できるように設定します。  
+
+```
+cat << EOF > portworx-sc.yaml  
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: portworx-sc
+provisioner: kubernetes.io/portworx-volume
+parameters:
+  repl: "3"
+EOF
+kubectl apply -f portworx-sc.yaml
+```
+
+### Portworxを使ったMySQLのデプロイ  
+Deployment コントローラーを使って、MySQLをデプロイし、ストレージとしてPortworxを使ってみます。  
+
+```
+cat <<EOF > mysql.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-svc
+  labels:
+    app: mysql
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: mysql
+  clusterIP: None
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    app: mysql
+spec:
+  storageClassName: portworx-sc
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deploy
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+EOF
+kubectl apply -f mysql.yaml
+```
+
+- 実行結果
+
+```
+[root@master ~]# cat <<EOF > mysql.yaml
+> apiVersion: v1
+> kind: Service
+> metadata:
+#--略--
+>         persistentVolumeClaim:
+>           claimName: mysql-pv-claim
+> EOF
+[root@master ~]# kubectl apply -f mysql.yaml
+service/mysql-svc created
+persistentvolumeclaim/mysql-pv-claim created
+deployment.apps/mysql-deploy created
+```
+
+#### 確認  
+PodやPersistent Volumeの状態を確認してみます。  
+
+- pod
+  `kubectl get pod -o wide`
 
