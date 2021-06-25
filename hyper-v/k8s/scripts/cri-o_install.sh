@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
-export CRIO_VERSION=1.21
+export CRIO_VERSION=1.20
 export OS=CentOS_8
-export K8S_VERSION=1.21.0
+export K8S_VERSION=1.20.0
 export IPADDR=$(ip a show eth0 | grep inet | grep -v inet6 | awk '{print $2}' | cut -f1 -d/)
 export CLUSTER_NAME="k8scluster.training.home"
 

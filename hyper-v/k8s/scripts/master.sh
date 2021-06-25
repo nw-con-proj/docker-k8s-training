@@ -2,7 +2,7 @@
 
 set -e
 ##
-export VERSION=1.21.0
+export VERSION=1.20.0
 export OS=CentOS_8
 export IPADDR=$(ip a show eth0 | grep inet | grep -v inet6 | awk '{print $2}' | cut -f1 -d/)
 
