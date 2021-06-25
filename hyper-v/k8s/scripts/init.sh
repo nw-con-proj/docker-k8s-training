@@ -15,5 +15,6 @@ sed -i -e "s/^SELINUX=enforcing$/SELINUX=disabled/g" /etc/selinux/config
 # swap off
 swapoff -a
 sed -i '/swap/s/^/#/' /etc/fstab
-
+chmod +x /etc/rc.d/rc.local
+sed -i '$ a swapoff -a' /etc/rc.d/rc.local
 
