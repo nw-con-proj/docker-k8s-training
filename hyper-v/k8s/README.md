@@ -76,8 +76,8 @@ sudoでパスワードを求められた場合もパスワードは **vagrant** 
 
 ```
 [vagrant@master ~]$ kubectl cluster-info
-Kubernetes control plane is running at https://192.168.225.100:6443
-CoreDNS is running at https://192.168.225.100:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+Kubernetes control plane is running at https://192.168.0.100:6443
+CoreDNS is running at https://192.168.0.100:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 ```
@@ -96,10 +96,10 @@ worker-2.training.home   Ready    <none>                 9m18s   v1.21.0
 worker-3.training.home   Ready    <none>                 2m46s   v1.21.0
 [vagrant@master ~]$ kubectl get node -o wide
 NAME                     STATUS   ROLES                  AGE     VERSION   INTERNAL-IP       EXTERNAL-IP   OS-IMAGE                           KERNEL-VERSION          CONTAINER-RUNTIME
-master.training.home     Ready    control-plane,master   22m     v1.21.0   192.168.225.100   <none>        AlmaLinux 8.4 (Electric Cheetah)   4.18.0-305.el8.x86_64   cri-o://1.21.0
-worker-1.training.home   Ready    <none>                 15m     v1.21.0   192.168.225.101   <none>        AlmaLinux 8.4 (Electric Cheetah)   4.18.0-305.el8.x86_64   cri-o://1.21.0
-worker-2.training.home   Ready    <none>                 9m22s   v1.21.0   192.168.225.102   <none>        AlmaLinux 8.4 (Electric Cheetah)   4.18.0-305.el8.x86_64   cri-o://1.21.0
-worker-3.training.home   Ready    <none>                 2m50s   v1.21.0   192.168.225.103   <none>        AlmaLinux 8.4 (Electric Cheetah)   4.18.0-305.el8.x86_64   cri-o://1.21.0
+master.training.home     Ready    control-plane,master   22m     v1.21.0   192.168.0.100   <none>        AlmaLinux 8.4 (Electric Cheetah)   4.18.0-305.el8.x86_64   cri-o://1.21.0
+worker-1.training.home   Ready    <none>                 15m     v1.21.0   192.168.0.101   <none>        AlmaLinux 8.4 (Electric Cheetah)   4.18.0-305.el8.x86_64   cri-o://1.21.0
+worker-2.training.home   Ready    <none>                 9m22s   v1.21.0   192.168.0.102   <none>        AlmaLinux 8.4 (Electric Cheetah)   4.18.0-305.el8.x86_64   cri-o://1.21.0
+worker-3.training.home   Ready    <none>                 2m50s   v1.21.0   192.168.0.103   <none>        AlmaLinux 8.4 (Electric Cheetah)   4.18.0-305.el8.x86_64   cri-o://1.21.0
 ```
 
 > *-o wide*と指定することで詳細な情報を出力することができます。  
@@ -159,7 +159,7 @@ hello-world   0/1     Completed   0          36s   10.244.3.193   worker-2.train
 Name:         hello-world
 Namespace:    default
 Priority:     0
-Node:         worker-2.training.home/192.168.225.102
+Node:         worker-2.training.home/192.168.0.102
 Start Time:   Mon, 21 Jun 2021 14:15:02 +0900
 Labels:       run=hello-world
 Annotations:  cni.projectcalico.org/podIP:
@@ -328,7 +328,7 @@ nginx-pod   1/1     Running   0          2m10s
 Name:         nginx-pod
 Namespace:    default
 Priority:     0
-Node:         worker-3.training.home/192.168.225.103
+Node:         worker-3.training.home/192.168.0.103
 Start Time:   Mon, 21 Jun 2021 14:17:44 +0900
 Labels:       <none>
 Annotations:  cni.projectcalico.org/podIP: 10.244.30.65/32
@@ -687,7 +687,7 @@ nginx-deploy-7d776cc564-skklz   1/1     Running   0          49s
 Name:         nginx-deploy-7d776cc564-skklz
 Namespace:    default
 Priority:     0
-Node:         worker-2.training.home/192.168.225.102
+Node:         worker-2.training.home/192.168.0.102
 Start Time:   Mon, 21 Jun 2021 16:09:13 +0900
 Labels:       app=nginx
               pod-template-hash=7d776cc564
@@ -933,10 +933,10 @@ NodePortを使った場合、接続先のIPは Kubernetesクラスタのどこ�
 Kubernetesクラスタのすべてのノードの **30080** にアクセスしてみます。  
 
 - ホストOS（Windows）上のWebブラウザを開き、下記にアクセスしてみます。  
-  `http://192.168.225.100:30080`
-  `http://192.168.225.101:30080`
-  `http://192.168.225.102:30080`
-  `http://192.168.225.103:30080`
+  `http://192.168.0.100:30080`
+  `http://192.168.0.101:30080`
+  `http://192.168.0.102:30080`
+  `http://192.168.0.103:30080`
 
   ![](../../img/2021-06-22_10h37_37.png)
   ![](../../img/2021-06-22_10h37_57.png)
@@ -953,10 +953,10 @@ Nginx Podのindex.htmlでPodのホスト名が表示されるように変更し�
   `for pod in $(kubectl get pods |awk 'NR>1 {print $1}'|grep nginx-deploy); do kubectl exec $pod -- /bin/sh -c "hostname>/usr/share/nginx/html/index.html"; done`
 
 - 繰り返しサーバーにアクセスしてみる  
-  `while true; do curl http://192.168.225.100:30080; sleep 1; done` 
+  `while true; do curl http://192.168.0.100:30080; sleep 1; done` 
 
 ```
-[vagrant@master ~]$ while true; do curl http://192.168.225.100:30080; sleep 1; done
+[vagrant@master ~]$ while true; do curl http://192.168.0.100:30080; sleep 1; done
 nginx-deploy-7d776cc564-bwf4f
 nginx-deploy-7d776cc564-bwf4f
 nginx-deploy-7d776cc564-lvt87
@@ -1004,7 +1004,7 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - 192.168.225.150-192.168.225.190
+      - 192.168.0.150-192.168.0.190
 EOF
 kubectl apply -f metallbconf.yaml
 ```
@@ -1039,7 +1039,7 @@ service/nginx created
 [vagrant@master ~]$ kubectl get service
 NAME            TYPE           CLUSTER-IP      EXTERNAL-IP       PORT(S)          AGE
 kubernetes      ClusterIP      10.96.0.1       <none>            443/TCP          23h
-nginx           LoadBalancer   10.100.1.21     192.168.225.150   8080:31731/TCP   6s
+nginx           LoadBalancer   10.100.1.21     192.168.0.150   8080:31731/TCP   6s
 nginx-service   NodePort       10.96.168.111   <none>            80:30080/TCP     159m
 ```
 
@@ -1047,10 +1047,10 @@ nginx-service   NodePort       10.96.168.111   <none>            80:30080/TCP   
 LoadBalancerのアクセス先は*kubectl get service*で表示されたこの情報をもとに行います。  
 
 ```
-nginx           LoadBalancer   10.100.1.21     192.168.225.150   8080:31731/TCP   6s
+nginx           LoadBalancer   10.100.1.21     192.168.0.150   8080:31731/TCP   6s
 ```
 
-LoadBalancerは **8080** で待ち受けていますので、 `http://192.168.225.150:8080` にアクセスします。  
+LoadBalancerは **8080** で待ち受けていますので、 `http://192.168.0.150:8080` にアクセスします。  
 ![](../../img/2021-06-22_13h38_50.png)  
 
 
