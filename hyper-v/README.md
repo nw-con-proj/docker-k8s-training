@@ -4,7 +4,7 @@ Azure Lab Servicesの入れ子になった仮想マシン(Windows Server 2019)�
 
 手順は3つに分かれいます。  
 
-1. [Lab作成者がテンプレート仮想マシンに事前に実施する作業](prepare/RREADME.md)  
+1. [Lab作成者がテンプレート仮想マシンに事前に実施する作業](prepare/README.md)  
 2. [Lab利用者がDockerのハンズオンを実施する手順](docker_almalinux/README.md)
 3. [Lab利用者がKubernetesのハンズオンを実施する手順](k8s/README.md)  
 
