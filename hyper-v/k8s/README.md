@@ -1064,10 +1064,11 @@ Kubernetes の永続ボリュームの作成方法については様々な方法
 
 詳細は井上さんの資料を確認してください。  
 
-### Portworxのインストール  
-今回はSDSとしてPortworxをインストールして利用します。  
+### Rook/Cephのインストール  
+今回はSDSとして、Rook/Cephをインストールします。
 SDSとして使うDiskは Workerノードにマウントされている **/dev/sdb** です。  
 
+- workerノードのDisk構成
 ```
 [vagrant@worker-1 ~]$ lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
@@ -1077,157 +1078,202 @@ mqsda2   8:2    0 17.6G  0 part /
 sdb      8:16   0   10G  0 disk
 ```
 
-**Master node**にて下記コマンドを実行し、インストールします。  
-`kubectl apply -f 'https://install.portworx.com/2.7?comp=pxoperator'`  
-少し待ってから、下記を実行
-`kubectl apply -f 'https://install.portworx.com/2.7?operator=true&mc=false&kbver=&oem=esse&user=8dea14c3-40dd-11eb-a2c5-c24e499c7467&b=true&c=px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e&stork=true&csi=true&lh=true&mon=true&st=k8s&e=storage%3Dportworx&promop=true'`  
-
+- インストール  
 
 ```
-[root@master ~]# kubectl apply -f 'https://install.portworx.com/2.7?comp=pxoperator'
-serviceaccount/portworx-operator created
-podsecuritypolicy.policy/px-operator created
-clusterrole.rbac.authorization.k8s.io/portworx-operator created
-clusterrolebinding.rbac.authorization.k8s.io/portworx-operator created
-deployment.apps/portworx-operator created
-
-[root@master ~]# kubectl apply -f 'https://install.portworx.com/2.7?operator=true&mc=false&kbver=&oem=esse&user=8dea14c3-40dd-11eb-a2c5-c24e499c7467&b=true&c=px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e&stork=true&csi=true&lh=true&mon=true&st=k8s&e=storage%3Dportworx&promop=true'
-storagecluster.core.libopenstorage.org/px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e created
-secret/px-essential created
-```  
-
-Podやその他のリソースが作成され始めます。  
-`kubectl get pod -n kube-system` を実行し、すべてのPodが **Running** となり、*Ready*の値が 2/2 などすべて動いていることを確認します。  
-※ 10~15分かかります。  
-
-```
-[root@master ~]# kubectl -n kube-system get pods
-NAME                                                    READY   STATUS    RESTARTS   AGE
-autopilot-7b4f7f58f4-hrl6l                              1/1     Running   0          7m34s
-calico-kube-controllers-7f4f5bf95d-qgfd6                1/1     Running   0          83m
-calico-node-8plwf                                       1/1     Running   0          72m
-calico-node-cz4c4                                       1/1     Running   0          83m
-calico-node-j7954                                       1/1     Running   0          78m
-calico-node-z2wvk                                       1/1     Running   0          66m
-coredns-74ff55c5b-cwlbq                                 1/1     Running   0          83m
-coredns-74ff55c5b-w6f9c                                 1/1     Running   0          83m
-etcd-master.training.home                               1/1     Running   0          83m
-kube-apiserver-master.training.home                     1/1     Running   0          83m
-kube-controller-manager-master.training.home            1/1     Running   1          83m
-kube-proxy-gdfkc                                        1/1     Running   0          72m
-kube-proxy-gxv6h                                        1/1     Running   0          66m
-kube-proxy-pwf2g                                        1/1     Running   0          78m
-kube-proxy-x2hv6                                        1/1     Running   0          83m
-kube-scheduler-master.training.home                     1/1     Running   1          83m
-portworx-api-952vt                                      1/1     Running   0          7m33s
-portworx-api-jhgws                                      1/1     Running   0          7m33s
-portworx-api-q9vds                                      1/1     Running   0          7m33s
-portworx-kvdb-4gk5j                                     1/1     Running   0          83s
-portworx-kvdb-7kcf5                                     1/1     Running   0          98s
-portworx-kvdb-crj9m                                     1/1     Running   0          65s
-portworx-operator-d6567d9d6-q2xbz                       1/1     Running   1          8m21s
-prometheus-px-prometheus-0                              3/3     Running   1          6m16s
-px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e-6bg6r   2/2     Running   0          7m34s
-px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e-6fwdw   2/2     Running   0          7m34s
-px-cluster-b7d928f9-cddd-4323-b306-6a68448c8b7e-ngzrb   2/2     Running   0          7m34s
-px-csi-ext-5686675c58-ncghm                             3/3     Running   0          7m35s
-px-csi-ext-5686675c58-nmlz8                             3/3     Running   0          7m35s
-px-csi-ext-5686675c58-slcxs                             3/3     Running   0          7m35s
-px-lighthouse-7dc48b77c8-jqxw4                          3/3     Running   0          7m40s
-px-prometheus-operator-8c88487bc-59zx4                  1/1     Running   0          7m35s
-stork-78d49d769c-bvt8s                                  1/1     Running   1          7m41s
-stork-78d49d769c-dvqh5                                  1/1     Running   1          7m41s
-stork-78d49d769c-mjf9k                                  1/1     Running   0          7m41s
-stork-scheduler-586cdb9796-9nfzt                        1/1     Running   0          7m40s
-stork-scheduler-586cdb9796-m27w2                        1/1     Running   0          7m40s
-stork-scheduler-586cdb9796-pm7lq                        1/1     Running   1          7m40s
+git clone --single-branch --branch v1.6.6 https://github.com/rook/rook.git
+cd rook/cluster/examples/kubernetes/ceph
+kubectl create -f crds.yaml -f common.yaml -f operator.yaml
+kubectl create -f cluster.yaml
 ```
 
-#### Portworxのステータス確認  
-Portworxのステータスを確認します。  
-GUIが自動的にインストールされているのでGUIから確認します。  
-
-- kubernetes上のPortworxGUIのServiceを確認します。 
-  `kubectl -n kube-system get service` を実行します。  
-  出力されたリストの **px-lighthouse** がGUIの設定です。  
+Podがすべて "Running" もしくは "Complate" になるまで待ちます。
 
 ```
-[root@master ~]# kubectl -n kube-system get svc
-NAME                        TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                               AGE
-kube-dns                    ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP                84m
-kubelet                     ClusterIP   None             <none>        10250/TCP                             6m56s
-portworx-api                ClusterIP   10.110.88.11     <none>        9001/TCP,9020/TCP,9021/TCP            8m10s
-portworx-operator-metrics   ClusterIP   10.105.180.81    <none>        8999/TCP                              8m22s
-portworx-service            ClusterIP   10.101.207.239   <none>        9001/TCP,9019/TCP,9020/TCP,9021/TCP   8m9s
-prometheus-operated         ClusterIP   None             <none>        9090/TCP                              6m52s
-px-csi-service              ClusterIP   None             <none>        <none>                                8m10s
-px-lighthouse               NodePort    10.105.202.26    <none>        80:31796/TCP,443:30891/TCP            8m15s
-px-prometheus               ClusterIP   10.111.23.9      <none>        9090/TCP                              8m10s
-stork-service               ClusterIP   10.98.138.26     <none>        8099/TCP,443/TCP                      8m16s
+[root@master ceph]# kubectl -n rook-ceph get pod
+NAME                                                              READY   STATUS      RESTARTS   AGE
+csi-cephfsplugin-5lqcr                                            3/3     Running     0          21m
+csi-cephfsplugin-8ghk4                                            3/3     Running     0          21m
+csi-cephfsplugin-provisioner-78d66674d8-7ggdz                     6/6     Running     0          21m
+csi-cephfsplugin-provisioner-78d66674d8-sx7kf                     6/6     Running     0          21m
+csi-cephfsplugin-q6wx5                                            3/3     Running     0          21m
+csi-rbdplugin-bdv95                                               3/3     Running     0          21m
+csi-rbdplugin-bq7nn                                               3/3     Running     0          21m
+csi-rbdplugin-pgd6g                                               3/3     Running     0          21m
+csi-rbdplugin-provisioner-687cf777ff-nh927                        6/6     Running     0          21m
+csi-rbdplugin-provisioner-687cf777ff-zqplk                        6/6     Running     0          21m
+rook-ceph-crashcollector-worker-1.training.home-5b78f88bc5g7k79   1/1     Running     0          18m
+rook-ceph-crashcollector-worker-2.training.home-86f4c54ddb4zr7r   1/1     Running     0          18m
+rook-ceph-crashcollector-worker-3.training.home-7d549c6555scssk   1/1     Running     0          18m
+rook-ceph-mgr-a-7ffdffbdd5-6dblj                                  1/1     Running     0          18m
+rook-ceph-mon-a-7887db7f66-46wlk                                  1/1     Running     0          20m
+rook-ceph-mon-b-6497d6c9fb-z69xj                                  1/1     Running     0          19m
+rook-ceph-mon-c-5c476c9d6c-q2d2h                                  1/1     Running     0          19m
+rook-ceph-operator-6b986cf46d-z78tn                               1/1     Running     0          24m
+rook-ceph-osd-prepare-worker-1.training.home-z2gth                0/1     Completed   0          13m
+rook-ceph-osd-prepare-worker-2.training.home-sp6ql                0/1     Completed   0          13m
+rook-ceph-osd-prepare-worker-3.training.home-fthvh                0/1     Completed   0          13m
 ```
 
+### ステータスの確認  
+Rook/CephのツールボックスをPodで展開し、Rook/Cephのステータスについて確認してみます。  
 
-- Nodeportが*80:31796*で設定されていますので、 Webブラウザから **http://192.168.0.100:31796** にアクセスします。  
-  user: admin   
-  password: Password1
-
-  ![](../../img/2021-06-28_13h28_21.png)  
-
-- Portworxクラスターのステータスが表示されます。  **px-cluster** をクリックします。  
-  [](../../img/2021-06-28_13h34_34.png)   
-
-- *Drives* をクリックし、どのデバイスがPortworxとして利用されているか確認します。  
-  各Workerノードの */dev/sdb* がPortworxのデバイスとして利用されていることがわかります。  
-  ![](../../img/2021-06-28_13h36_30.png)  
-
-
-### Storage Classの作成  
-PodからPersistent Volumeを切り出すときにPersistent Volume ClaimからStorage Classを指定Portworxを利用できるように設定します。  
+- ツールボックスをデプロイ  
 
 ```
-cat << EOF > portworx-sc.yaml  
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
+cat << EOF > toolbox.yaml  
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: portworx-sc
-provisioner: kubernetes.io/portworx-volume
-parameters:
-  repl: "3"
+  name: rook-ceph-tools
+  namespace: rook-ceph
+  labels:
+    app: rook-ceph-tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rook-ceph-tools
+  template:
+    metadata:
+      labels:
+        app: rook-ceph-tools
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: rook-ceph-tools
+        image: rook/ceph:v1.6.6
+        command: ["/tini"]
+        args: ["-g", "--", "/usr/local/bin/toolbox.sh"]
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: ROOK_CEPH_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: rook-ceph-mon
+                key: ceph-username
+          - name: ROOK_CEPH_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: rook-ceph-mon
+                key: ceph-secret
+        volumeMounts:
+          - mountPath: /etc/ceph
+            name: ceph-config
+          - name: mon-endpoint-volume
+            mountPath: /etc/rook
+      volumes:
+        - name: mon-endpoint-volume
+          configMap:
+            name: rook-ceph-mon-endpoints
+            items:
+            - key: data
+              path: mon-endpoints
+        - name: ceph-config
+          emptyDir: {}
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 5
 EOF
-kubectl apply -f portworx-sc.yaml
+kubectl apply -f toolbox.yaml 
 ```
 
-### Portworxを使ったMySQLのデプロイ  
+- ツールボックスのShellに接続  
+  `kubectl -n rook-ceph exec -it deploy/rook-ceph-tools -- bash`  
+
+- ステータス確認
+  `ceph status`  
+
+```
+[root@rook-ceph-tools-7b96766574-sn4pl /]# ceph status
+  cluster:
+    id:     eb7ac0ed-1b62-43b8-a63e-de4ef36f03a6
+    health: HEALTH_OK
+
+  services:
+    mon: 3 daemons, quorum a,b,c (age 3m)
+    mgr: a(active, since 2m)
+    osd: 3 osds: 3 up (since 3m), 3 in (since 3m)
+
+  data:
+    pools:   1 pools, 1 pgs
+    objects: 0 objects, 0 B
+    usage:   3.0 GiB used, 27 GiB / 30 GiB avail
+    pgs:     1 active+clean
+```
+  `exit` でPodから抜けます。  
+
+
+### StorageClassの作成  
+StorageClassを作成します。
+
+```
+cat << EOF > rook_ceph.yaml 
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: replicapool
+  namespace: rook-ceph
+spec:
+  failureDomain: host
+  replicated:
+    size: 3
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: rook-ceph-block
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+    clusterID: rook-ceph
+    pool: replicapool
+    imageFormat: "2"
+    imageFeatures: layering
+    csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+    csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+    csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+    csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+    csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+    csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+    csi.storage.k8s.io/fstype: ext4
+reclaimPolicy: Delete
+EOF
+kubectl apply -f rook_ceph.yaml
+```
+
+### Rook/Cephを使ったMySQLのデプロイ  
 Deployment コントローラーを使って、MySQLをデプロイし、ストレージとしてPortworxを使ってみます。  
 
 ```
-cat <<EOF > mysql.yaml
+cat <<EOF > mysql-sample.yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: mysql-svc
-  labels:
-    app: mysql
 spec:
-  ports:
-    - port: 3306
+  type: NodePort
   selector:
     app: mysql
-  clusterIP: None
+  ports:
+    - port: 3306
+      targetPort: 3306
+      nodePort: 30006
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mysql-pv-claim
+  name: mysql-sample-pv-claim
   labels:
     app: mysql
 spec:
-  storageClassName: portworx-sc
+  storageClassName: rook-ceph-block
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 3Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1262,25 +1308,28 @@ spec:
       volumes:
       - name: mysql-persistent-storage
         persistentVolumeClaim:
-          claimName: mysql-pv-claim
+          claimName: mysql-sample-pv-claim
 EOF
-kubectl apply -f mysql.yaml
+kubectl apply -f mysql-sample.yaml
 ```
 
 - 実行結果
 
 ```
-[root@master ~]# cat <<EOF > mysql.yaml
+[root@master kubernetes]# cat <<EOF > mysql-sample.yaml
 > apiVersion: v1
 > kind: Service
 > metadata:
-#--略--
+>   name: mysql-svc
+>   labels:
+#===略===
+>       - name: mysql-persistent-storage
 >         persistentVolumeClaim:
->           claimName: mysql-pv-claim
+>           claimName: mysql-sample-pv-claim
 > EOF
-[root@master ~]# kubectl apply -f mysql.yaml
+[root@master kubernetes]# kubectl apply -f mysql-sample.yaml
 service/mysql-svc created
-persistentvolumeclaim/mysql-pv-claim created
+persistentvolumeclaim/mysql-sample-pv-claim created
 deployment.apps/mysql-deploy created
 ```
 
@@ -1288,5 +1337,127 @@ deployment.apps/mysql-deploy created
 PodやPersistent Volumeの状態を確認してみます。  
 
 - pod
-  `kubectl get pod -o wide`
+  `kubectl get pod -o wide`  
+```
+[root@master kubernetes]# kubectl get pod -o wide
+NAME                            READY   STATUS    RESTARTS   AGE     IP             NODE                     NOMINATED NODE   READINESS GATES
+mysql-deploy-6557f867d5-fllzz   1/1     Running   0          5m29s   10.244.30.76   worker-3.training.home   <none>           <none>
+```
 
+- Persistent Volume 
+  `kubectl get pv`   
+```
+[root@master kubernetes]# kubectl get pv
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                           STORAGECLASS      REASON   AGE
+pvc-192fa93a-a352-4953-8b9a-698a56db0016   3Gi        RWO            Delete           Bound    default/mysql-sample-pv-claim   rook-ceph-block            5m36s
+```
+
+- Persistent Volume Claim  
+  `kubectl get pvc`  
+```
+[root@master kubernetes]# kubectl get pvc
+NAME                    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
+mysql-sample-pv-claim   Bound    pvc-192fa93a-a352-4953-8b9a-698a56db0016   3Gi        RWO            rook-ceph-block   5m44s
+```
+
+- Service
+  `kubectl get svc`  
+```
+[root@master kubernetes]# kubectl get svc
+NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+kubernetes   ClusterIP   10.96.0.1      <none>        443/TCP          16h
+mysql-svc    NodePort    10.97.170.67   <none>        3306:30006/TCP   15h
+```
+
+### MySQLにデータを書き込んでみる  
+今回、NodePortでサービスを公開していますので、Masterノード上にMySQLクライアントをインストールして、MySQLに接続しデータを書き込めることを確認してみます。  
+
+- mysql client のインストール  
+
+  Masterサーバ上で `dnf install -y mysql.x86_64` を実行することでインストールされます。 
+
+- サンプルデータをダウンロードしておきます。  
+```
+cd ~/ 
+curl -LO https://downloads.mysql.com/docs/world_x-db.tar.gz
+tar -zxvf world_x-db.tar.gz
+cd world_x-db
+```
+
+- mysql login
+
+  `mysql -u root -h 192.168.0.100 -P 30006 -p` を実行します。パスワードは **password** です。
+
+- databaseを確認  
+
+  `show databases;` を実行してDatabaseを確認します。  
+
+```
+mysql> show databases;
++---------------------+
+| Database            |
++---------------------+
+| information_schema  |
+| #mysql50#lost+found |
+| mysql               |
+| performance_schema  |
++---------------------+
+4 rows in set (0.00 sec)
+```
+
+- サンプルデータを書き込んでみる  
+  `source world_x.sql;` を実行します。エラーがでますが、何らかのデータを書きたいだけなので無視します。  
+
+- サンプルデータを確認してみる  
+  コマンドを実行し、サンプルデータが表示されることを確認します。  
+
+  ```
+  USE world_x;
+  show tables;
+  SELECT * FROM country LIMIT 10;
+  ```
+
+  確認が終わったら `exit` で抜けます。  
+
+
+### コンテナが再作成されてもデータが残っている確認してみる  
+
+Podを停止して再作成されたあとにMySQL DB上にサンプルデータが残っている確認してみます。  
+
+- 現在のMySQLのPodを確認します。 `kubectl get pod -o wide`  
+```
+[root@master world_x-db]# kubectl get po -o wide
+NAME                            READY   STATUS    RESTARTS   AGE   IP             NODE                     NOMINATED NODE   READINESS GATES
+mysql-deploy-6557f867d5-qt8nt   1/1     Running   0          24m   10.244.3.203   worker-2.training.home   <none>           <none>
+```
+
+- Podを停止します。 Pod nameを指定する必要があるので、上記の結果を例にコマンドを実行します。  
+  `kubectl delete pod mysql-deploy-6557f867d5-qt8nt`  
+
+```
+[root@master world_x-db]# kubectl delete po mysql-deploy-6557f867d5-qt8nt
+pod "mysql-deploy-6557f867d5-qt8nt" deleted
+```
+
+- 再作成されたPodが稼働していることを確認します。  `kubectl get pod -o wide`   
+  
+```
+[root@master world_x-db]# kubectl get po -o wide
+NAME                            READY   STATUS    RESTARTS   AGE   IP             NODE                     NOMINATED NODE   READINESS GATES
+mysql-deploy-6557f867d5-w5z8b   1/1     Running   0          87s   10.244.13.13   worker-1.training.home   <none>           <none>
+```
+
+- MySQLにログインしてデータが存在していることを確認します。  
+```
+mysql -u root -h 192.168.0.100 -P 30006 -p
+# パスワードは password
+show databases;
+USE world_x;
+show tables;
+SELECT * FROM country LIMIT 10;
+```
+
+DatabaseやTable、Tableの値が表示されることを確認します。  
+
+
+以上
