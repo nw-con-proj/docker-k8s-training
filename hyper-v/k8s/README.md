@@ -766,8 +766,7 @@ nginx-deploy-7d776cc564-skklz   1/1     Running   0          19m   10.244.3.198 
 ```
 
 - Nodeの停止  
-  ホストOS（Windows）のスタートメニューから **VirtualBox** を開き、対象のWorkerノードを選択、右クリックし、閉じる->ACPIシャットダウン　を実行します。  
-  ![](../../img/virtualbox1.png)
+  ホストOS（Windows）のスタートメニューから **Hyper-V** を開き、対象のWorkerノードを選択、右クリックし、シャットダウン　を実行します。  
 
 - 状態の監視  
   監視用のコンソールでWorker-2で稼働しているPodがどうなるか監視します。
