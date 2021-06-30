@@ -850,6 +850,7 @@ Worker-2は停止しているため、Podの削除は完了しません。
   監視用のコンソールを確認します。 ノードが起動し、Kubernetesクラスターのノードとして稼働したタイミングでTerminatingとなっていたPodが削除されます。  
   このとき、Podのリスケジュールは**行われません**  
   停止してたWorkerノードではPodが稼働していない状態になります。  
+  > TerminatingとなっていたPodが消えない事象が確認されていますがその場合は一旦無視して進んでください。
 
 ```
 Every 1.0s: kubectl get pod -o wide                                                   master.training.home: Mon Jun 21 16:49:24 2021
