@@ -91,7 +91,7 @@ To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 
 - クラスタのノード構成を確認
 
-`kubectl get node`
+`kubectl get node`  
 `kubectl get node -o wide`  
 
 ```
@@ -227,7 +227,7 @@ Events:
 KubernetesではPodが起動する際に失敗している場合は、*kubectl describe pod {pod_name}*で状況を確認します。
 Podが動作しているにもかかわらず、正常な動作になっていない場合は、Podのログを確認します。  
 
-`kubectl logs {pod_name}`  
+`kubectl logs hello-world`  
 Hello-worldのログでは下記のように出力されています。
 
 ```
@@ -324,7 +324,7 @@ pod/nginx-pod created
 ### Podの確認  
 Podが作成されていることを確認します。  
 
-`kubectl get pod`
+`kubectl get pod`  
 `kubectl describe pod nginx_pod`  
 
 ```
@@ -399,8 +399,9 @@ nginx-pod   1/1     Running   0          3m15s   10.244.13.1   worker-1.training
 ```
 
 - 別Podを対話型で実行してNginxに接続してみる  
-  `kubectl run busybox --image=busybox --restart=Never --rm -it sh`
-  `wget -q -O - http://10.244.13.1`  <-IPは自身の環境のNginx PodのIPにしてください。
+  `kubectl run busybox --image=busybox --restart=Never --rm -it sh`  
+
+  `wget -q -O - http://10.244.13.1`  <-IPは自身の環境のNginx PodのIPにしてください。  
 
 ```
 [vagrant@master ~]$ kubectl run busybox --image=busybox --restart=Never --rm -it sh
@@ -529,9 +530,9 @@ deployment.apps/nginx-deploy created
 ### 作成されたオブジェクトを確認してみる  
 いくつかコマンドを実行し、オブジェクトを確認します。
 
-`kubectl get deployment -o wide`
-`kubectl get replicaset -o wide`
-`kubectl get pod -o wide`
+`kubectl get deployment -o wide`  
+`kubectl get replicaset -o wide`  
+`kubectl get pod -o wide`  
 
 ```
 [vagrant@master ~]$ kubectl get deployment -o wide
@@ -766,7 +767,8 @@ nginx-deploy-7d776cc564-skklz   1/1     Running   0          19m   10.244.3.198 
 ```
 
 - Nodeの停止  
-  ホストOS（Windows）のスタートメニューから **Hyper-V** を開き、対象のWorkerノードを選択、右クリックし、シャットダウン　を実行します。  
+  ホストOS（Windows）のスタートメニューから **Hyper-V** を開き、対象のWorkerノードを選択、右クリックし、シャットダウン　を実行します。
+  ![](../../img/2021-06-30_17h34_38.png)  
 
 - 状態の監視  
   監視用のコンソールでWorker-2で稼働しているPodがどうなるか監視します。
@@ -842,7 +844,7 @@ Worker-2は停止しているため、Podの削除は完了しません。
 
 - Workerノードの起動
   停止したWorkerノードをVirtualBoxのコンソールから起動します。  
-  ![](../../img/virtualbox2.png)
+  ![](../../img/2021-06-30_17h35_22.png)
 
 - Podの状態確認  
   監視用のコンソールを確認します。 ノードが起動し、Kubernetesクラスターのノードとして稼働したタイミングでTerminatingとなっていたPodが削除されます。  
