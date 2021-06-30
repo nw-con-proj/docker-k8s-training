@@ -5,6 +5,7 @@
   - [目次](#目次)
   - [環境の立ち上げ](#環境の立ち上げ)
   - [VMへのログインと確認](#vmへのログインと確認)
+    - ["vagrant ssh"によるSSH接続について](#vagrant-sshによるssh接続について)
   - [Dockerの基本操作](#dockerの基本操作)
     - [Docker コマンドの確認](#docker-コマンドの確認)
     - [DockerでHello-worldコンテナを実行してみる](#dockerでhello-worldコンテナを実行してみる)
@@ -64,6 +65,10 @@ puttyやTeraterm等でSSH接続が可能です。また、立ち上げ時につ�
 |password|vagrant|
 
 sudoでパスワードを求められた場合もパスワードは **vagrant** です。
+
+### "vagrant ssh"によるSSH接続について
+`vagrant ssh`を使ったSSH接続を行う場合、`vagrant up`を実行したディレクトリに移動して実行する必要があります。  
+具体的には GitBash上で、`cd /c/vm/docker-k8s-training/hyper-v/docker_almalinux` に移動してから実行してください。
 
 ## Dockerの基本操作  
 

@@ -67,6 +67,11 @@ puttyやTeraterm等でSSH接続が可能です。また、立ち上げ時につ�
 
 sudoでパスワードを求められた場合もパスワードは **vagrant** です。  
 
+### "vagrant ssh master"によるSSH接続について
+`vagrant ssh master`を使ったSSH接続を行う場合、`vagrant up`を実行したディレクトリに移動して実行する必要があります。  
+具体的には GitBash上で、`cd /c/vm/docker-k8s-training/hyper-v/k8s` に移動してから実行してください。
+
+
 
 ## KubectlからKubernetesクラスタを確認してみる
 まずは最初にKubectlを使って、Kubernetesクラスタを確認してみます。  
