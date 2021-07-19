@@ -35,6 +35,8 @@
       - [稼働している環境の削除](#稼働している環境の削除)
       - [実行](#実行)
   - [Docker Composeを使ってみる](#docker-composeを使ってみる)
+    - [docker-compose の停止](#docker-compose-の停止)
+    - [docker-compose の削除](#docker-compose-の削除)
 
 
 ## 環境の立ち上げ  
@@ -598,7 +600,7 @@ Docker を使ってコンテナ開発（作る）には **docker build** とい�
 を記述し**docker build**を実行します。  
 この処理を実行することで、オリジナルのコンテナーイメージが作成されますので、作成されたイメージをリポジトリ（docker hubなど)に配置し、実際に利用することになります。  
   
-![](../../img/docker_001.png)  
+ 
 
 ### 必要なもの  
 
@@ -991,4 +993,40 @@ Creating wordpress_wordpress_1 ... done
 - 確認  
 Windows ホスト上のWebブラウザから [http://192.168.0.10:8000](http://192.168.0.10:8000) にアクセスするとWordpressの初期設定画面が表示されます。  
 もし表示されない場合は少し待ってから接続してください。  
+
+### docker-compose の停止  
+"docker-compose"で稼働させたコンテナを停止させます。  
+
+`docker-compose stop`    
+
+```
+[vagrant@docker wordpress]$ docker-compose stop
+Stopping wordpress_wordpress_1 ... done
+Stopping wordpress_db_1        ... done
+```
+
+停止なので、再スタートさせることもできます。  
+今回は実施していないですが、永続ボリュームを持っている場合、"stop"では削除しないのでデータは残っています。  
+
+`docker-compose start`
+
+```
+[vagrant@docker wordpress]$ docker-compose start
+Starting db        ... done
+Starting wordpress ... done
+```
+
+### docker-compose の削除  
+"docker-compose"で稼働させたコンテナを停止し削除します。  
+
+`docker-compose down`  
+
+```
+[vagrant@docker wordpress]$ docker-compose down
+Stopping wordpress_wordpress_1 ... done
+Stopping wordpress_db_1        ... done
+Removing wordpress_wordpress_1 ... done
+Removing wordpress_db_1        ... done
+Removing network wordpress_default
+```
 
