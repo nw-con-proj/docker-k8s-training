@@ -75,12 +75,12 @@ Azure Lab Servicesを使う方はHyper-V版を使ってください。
 座学はありませんのでWeb上にある素敵な資料をご確認ください。最低限[この資料](https://www.slideshare.net/KoheiTokunaga/ss-122754942)を読んでおくとわかりやすいと思います。
 
 DockerやKubernetesを動かす環境がない人向けにAzure Lab Serviceを利用しハンズオンをしていただくことも可能です。  
-
 環境の起動からハンズオンまでを含めた手順はそれぞれ下記をご確認ください。  
+> Azure Lab Serviceを利用する場合は **Hyper-Vを利用** を参照してください。
+
 
 [Hyper-Vを利用](hyper-v/README.md)  
-[VirtualBox利用](virtualbox/README.md)  
-
+未完成)[VirtualBox利用](virtualbox/README.md)  
 
 
 ## Azure Lab Servicesセットアップ  
