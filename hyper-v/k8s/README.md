@@ -1,6 +1,56 @@
 # Kubernetes ハンズオン  
 
 ## 目次
+- [Kubernetes ハンズオン](#kubernetes-ハンズオン)
+  - [目次](#目次)
+  - [ハンズオン環境の構成](#ハンズオン環境の構成)
+    - [CRI-O (くらいお)](#cri-o-くらいお)
+  - [環境の立ち上げ](#環境の立ち上げ)
+    - [環境の作成方法](#環境の作成方法)
+    - [ハンズオン用のVM](#ハンズオン用のvm)
+  - [VMへのログインと確認](#vmへのログインと確認)
+    - ["vagrant ssh master"によるSSH接続について](#vagrant-ssh-masterによるssh接続について)
+  - [KubectlからKubernetesクラスタを確認してみる](#kubectlからkubernetesクラスタを確認してみる)
+    - [クラスタの状態確認](#クラスタの状態確認)
+  - [CLIによるPodの実行](#cliによるpodの実行)
+    - [Pod を確認してみる](#pod-を確認してみる)
+    - [Podのログを確認してみる](#podのログを確認してみる)
+    - [Podの削除](#podの削除)
+  - [マニフェストを使ったPodの実行](#マニフェストを使ったpodの実行)
+    - [Nginx のPodを起動するマニフェストを書いてみる](#nginx-のpodを起動するマニフェストを書いてみる)
+    - [マニフェストの適用](#マニフェストの適用)
+    - [Podの確認](#podの確認)
+    - [Nginxの動作確認](#nginxの動作確認)
+    - [マニフェストを使ったPodの削除](#マニフェストを使ったpodの削除)
+  - [Deploymentコントローラーを使ったPodのデプロイ](#deploymentコントローラーを使ったpodのデプロイ)
+    - [Deploymentのマニフェストを作成](#deploymentのマニフェストを作成)
+    - [マニフェストを適用してみる](#マニフェストを適用してみる)
+    - [作成されたオブジェクトを確認してみる](#作成されたオブジェクトを確認してみる)
+    - [スケール機能](#スケール機能)
+    - [スケールダウン](#スケールダウン)
+    - [ロールアウト](#ロールアウト)
+    - [自己回復機能](#自己回復機能)
+      - [ノードを復旧するとどうなるか](#ノードを復旧するとどうなるか)
+    - [サービスを定義してNginx Podにクラスタ外からアクセスしてみる(NodePort)](#サービスを定義してnginx-podにクラスタ外からアクセスしてみるnodeport)
+    - [NodePortのマニフェストを作ってみる](#nodeportのマニフェストを作ってみる)
+      - [ServiceがどうやってPodに紐づけられるか？](#serviceがどうやってpodに紐づけられるか)
+    - [NodePortのサービスを展開してみる](#nodeportのサービスを展開してみる)
+    - [クラスタ外からNginxにアクセスしてみる](#クラスタ外からnginxにアクセスしてみる)
+    - [1つのServiceで複数のPodにトラフィックが分散されることを確認してみる](#1つのserviceで複数のpodにトラフィックが分散されることを確認してみる)
+    - [LoadBalancerのサービスを使ってみる](#loadbalancerのサービスを使ってみる)
+      - [MetalLBのインストール](#metallbのインストール)
+      - [LoadBalancerのマニフェストを作成](#loadbalancerのマニフェストを作成)
+      - [マニフェストを適用してLoadBalancerサービスを作成](#マニフェストを適用してloadbalancerサービスを作成)
+      - [動作確認](#動作確認)
+  - [Persistent Volume (永続ボリューム)](#persistent-volume-永続ボリューム)
+    - [Rook/Cephのインストール](#rookcephのインストール)
+    - [ステータスの確認](#ステータスの確認)
+    - [StorageClassの作成](#storageclassの作成)
+    - [Rook/Cephを使ったMySQLのデプロイ](#rookcephを使ったmysqlのデプロイ)
+      - [確認](#確認)
+    - [MySQLにデータを書き込んでみる](#mysqlにデータを書き込んでみる)
+    - [コンテナが再作成されてもデータが残っている確認してみる](#コンテナが再作成されてもデータが残っている確認してみる)
+  - [ハンズオンが終わったら](#ハンズオンが終わったら)
 
 ## ハンズオン環境の構成  
 1Master,3Workerの構成になっています。  
@@ -39,7 +89,12 @@ vagrant up
 
 VMが作成されるまで20分程度待ちます。  
 まれに作成中にエラーが発生する場合があります。特に **master**を構成している際にメモリ不足で失敗しているようなエラーがでます。
-この場合は、一度 `vagrant destroy -f` を実行し、環境を消した後に再度 `vagrant up` を実行してください。
+この場合は、一度 `vagrant destroy -f` を実行し、環境を消した後に再度 `vagrant up` を実行してください。  
+
+> プラグインのインストール画面が表示された場合、**y**を入力しインストール後、再度 `vagrant up` を実行します。
+> VMが作成されるまで5分程度待ちます。  
+> `Install local plugins (Y/N) [N]: y`
+
 
 ### 環境の作成方法  
 kubeadmを利用してKubernetesクラスタを作成しています。  
@@ -325,7 +380,7 @@ pod/nginx-pod created
 Podが作成されていることを確認します。  
 
 `kubectl get pod`  
-`kubectl describe pod nginx_pod`  
+`kubectl describe pod nginx-pod`  
 
 ```
 [vagrant@master ~]$ kubectl get pod
@@ -1075,7 +1130,7 @@ Kubernetes の永続ボリュームの作成方法については様々な方法
 今回はSDSとして、Rook/Cephをインストールします。
 SDSとして使うDiskは Workerノードにマウントされている **/dev/sdb** です。  
 
-- workerノードのDisk構成
+workerノードのDisk構成は下記のようになっています。確認したい場合はworkerノードにログインして確認してください。  
 ```
 [vagrant@worker-1 ~]$ lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
@@ -1086,6 +1141,7 @@ sdb      8:16   0   10G  0 disk
 ```
 
 - インストール  
+master nodeにログインしている状態で下記コマンドを実行します。  
 
 ```
 git clone --single-branch --branch v1.6.6 https://github.com/rook/rook.git
@@ -1465,6 +1521,17 @@ SELECT * FROM country LIMIT 10;
 ```
 
 DatabaseやTable、Tableの値が表示されることを確認します。  
+
+
+## ハンズオンが終わったら  
+Azure Lab Serviceで無操作の場合は自動的にシャットダウンされるように設定されていますので、なにも実施しなくても問題ありません。
+環境を削除する場合は **Git bash** を使って下記コマンドを実行します。  
+
+```
+cd /c/vm/docker-k8s-training/hyper-v/k8s
+vagrant destroy -f
+```
+
 
 
 以上

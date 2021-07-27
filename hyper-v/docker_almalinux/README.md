@@ -37,6 +37,7 @@
   - [Docker Composeを使ってみる](#docker-composeを使ってみる)
     - [docker-compose の停止](#docker-compose-の停止)
     - [docker-compose の削除](#docker-compose-の削除)
+  - [ハンズオンが終わったら](#ハンズオンが終わったら)
 
 
 ## 環境の立ち上げ  
@@ -56,6 +57,11 @@ vagrant up
 
 一度、プラグインのインストール画面が表示されるので、**y**を入力しインストール後、再度 `vagrant up` を実行します。
 VMが作成されるまで5分程度待ちます。  
+`Install local plugins (Y/N) [N]: y`
+
+
+> 環境の作成(vagrant upの2回目)を実行後に環境に失敗することがあります。
+> その場合は、 `vagrant destroy -f` を実行し環境を削除後に再度 `vagrant up` を実行してください。
 
 ## VMへのログインと確認  
 puttyやTeraterm等でSSH接続が可能です。また、立ち上げ時につかったGitBashの画面上で `vagrant ssh` とすることで接続できます。
@@ -1029,4 +1035,16 @@ Removing wordpress_wordpress_1 ... done
 Removing wordpress_db_1        ... done
 Removing network wordpress_default
 ```
+
+## ハンズオンが終わったら  
+Azure Lab Serviceで無操作の場合は自動的にシャットダウンされるように設定されていますので、なにも実施しなくても問題ありません。
+環境を削除する場合は **Git bash** を使って下記コマンドを実行します。  
+
+```
+cd /c/vm/docker-k8s-training/hyper-v/docker_almalinux
+vagrant destroy -f
+```
+
+
+以上
 
